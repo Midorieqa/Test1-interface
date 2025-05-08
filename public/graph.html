@@ -1,0 +1,489 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 750px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#bdbdbd", "id": "Colin Graves", "label": "Colin Graves", "shape": "dot", "title": "Colin Graves (Unrated)"}, {"color": "#bdbdbd", "id": "II-VI Incorporated", "label": "II-VI Incorporated", "shape": "dot", "title": "II-VI Incorporated (Unrated)"}, {"color": "#bdbdbd", "id": "Emily Brough", "label": "Emily Brough", "shape": "dot", "title": "Emily Brough (Unrated)"}, {"color": "#bdbdbd", "id": "Shenzhen Bytter Technology Co., Ltd.", "label": "Shenzhen Bytter Technology Co., Ltd.", "shape": "dot", "title": "Shenzhen Bytter Technology Co., Ltd. (Unrated)"}, {"color": "#bdbdbd", "id": "Fidelity", "label": "Fidelity", "shape": "dot", "title": "Fidelity (Unrated)"}, {"color": "#bdbdbd", "id": "Best Formulations", "label": "Best Formulations", "shape": "dot", "title": "Best Formulations (Unrated)"}, {"color": "#bdbdbd", "id": "C.C. Wei", "label": "C.C. Wei", "shape": "dot", "title": "C.C. Wei (Unrated)"}, {"color": "#bdbdbd", "id": "Wealthsimple", "label": "Wealthsimple", "shape": "dot", "title": "Wealthsimple (Unrated)"}, {"color": "#bdbdbd", "id": "Vimian Group AB", "label": "Vimian Group AB", "shape": "dot", "title": "Vimian Group AB (Unrated)"}, {"color": "#bdbdbd", "id": "Shuntaro Furukawa", "label": "Shuntaro Furukawa", "shape": "dot", "title": "Shuntaro Furukawa (Unrated)"}, {"color": "#bdbdbd", "id": "TSMC", "label": "TSMC", "shape": "dot", "title": "TSMC (Unrated)"}, {"color": "#bdbdbd", "id": "Teletubbies", "label": "Teletubbies", "shape": "dot", "title": "Teletubbies (Unrated)"}, {"color": "#bdbdbd", "id": "Elliott Brown", "label": "Elliott Brown", "shape": "dot", "title": "Elliott Brown (Unrated)"}, {"color": "#bdbdbd", "id": "E*TRADE", "label": "E*TRADE", "shape": "dot", "title": "E*TRADE (Unrated)"}, {"color": "#bdbdbd", "id": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale", "label": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale", "shape": "dot", "title": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale (Unrated)"}, {"color": "#bdbdbd", "id": "Dan Schmidt", "label": "Dan Schmidt", "shape": "dot", "title": "Dan Schmidt (Unrated)"}, {"color": "#bdbdbd", "id": "TradingView", "label": "TradingView", "shape": "dot", "title": "TradingView (Unrated)"}, {"color": "#bdbdbd", "id": "Hey Zozo\u2019s", "label": "Hey Zozo\u2019s", "shape": "dot", "title": "Hey Zozo\u2019s (Unrated)"}, {"color": "#bdbdbd", "id": "09992", "label": "09992", "shape": "dot", "title": "09992 (Unrated)"}, {"color": "#bdbdbd", "id": "PricewaterhouseCoopers", "label": "PricewaterhouseCoopers", "shape": "dot", "title": "PricewaterhouseCoopers (Unrated)"}, {"color": "#bdbdbd", "id": "HP", "label": "HP", "shape": "dot", "title": "HP (Unrated)"}, {"color": "#bdbdbd", "id": "UBS Asset Management AG", "label": "UBS Asset Management AG", "shape": "dot", "title": "UBS Asset Management AG (Unrated)"}, {"color": "#bdbdbd", "id": "Shubham Pandey", "label": "Shubham Pandey", "shape": "dot", "title": "Shubham Pandey (Unrated)"}, {"color": "#bdbdbd", "id": "Nongfu Spring", "label": "Nongfu Spring", "shape": "dot", "title": "Nongfu Spring (Unrated)"}, {"color": "#bdbdbd", "id": "Brand Finance", "label": "Brand Finance", "shape": "dot", "title": "Brand Finance (Unrated)"}, {"color": "#bdbdbd", "id": "Yuhong Chen", "label": "Yuhong Chen", "shape": "dot", "title": "Yuhong Chen (Unrated)"}, {"color": "#bdbdbd", "id": "not specified", "label": "not specified", "shape": "dot", "title": "not specified (Unrated)"}, {"color": "#bdbdbd", "id": "Erin Morris", "label": "Erin Morris", "shape": "dot", "title": "Erin Morris (Unrated)"}, {"color": "#bdbdbd", "id": "Richard", "label": "Richard", "shape": "dot", "title": "Richard (Unrated)"}, {"color": "#bdbdbd", "id": "TheFXperts", "label": "TheFXperts", "shape": "dot", "title": "TheFXperts (Unrated)"}, {"color": "#bdbdbd", "id": "Khalid Siddiqui", "label": "Khalid Siddiqui", "shape": "dot", "title": "Khalid Siddiqui (Unrated)"}, {"color": "#bdbdbd", "id": "Peter Shipman", "label": "Peter Shipman", "shape": "dot", "title": "Peter Shipman (Unrated)"}, {"color": "#bdbdbd", "id": "Futu Holdings Ltd", "label": "Futu Holdings Ltd", "shape": "dot", "title": "Futu Holdings Ltd (Unrated)"}, {"color": "#bdbdbd", "id": "Ishan Jain", "label": "Ishan Jain", "shape": "dot", "title": "Ishan Jain (Unrated)"}, {"color": "#bdbdbd", "id": "EuQlid", "label": "EuQlid", "shape": "dot", "title": "EuQlid (Unrated)"}, {"color": "#bdbdbd", "id": "M1 Finance", "label": "M1 Finance", "shape": "dot", "title": "M1 Finance (Unrated)"}, {"color": "#bdbdbd", "id": "Yaling Jiang", "label": "Yaling Jiang", "shape": "dot", "title": "Yaling Jiang (Unrated)"}, {"color": "#fc8d59", "id": "Zhenyu Technology", "label": "Zhenyu Technology", "shape": "dot", "title": "Zhenyu Technology (Medium)"}, {"color": "#bdbdbd", "id": "TikTok", "label": "TikTok", "shape": "dot", "title": "TikTok (Unrated)"}, {"color": "#bdbdbd", "id": "4C Medical Technologies", "label": "4C Medical Technologies", "shape": "dot", "title": "4C Medical Technologies (Unrated)"}, {"color": "#bdbdbd", "id": "Hyoun Park", "label": "Hyoun Park", "shape": "dot", "title": "Hyoun Park (Unrated)"}, {"color": "#bdbdbd", "id": "Boston Scientific Corp.", "label": "Boston Scientific Corp.", "shape": "dot", "title": "Boston Scientific Corp. (Unrated)"}, {"color": "#bdbdbd", "id": "Micron", "label": "Micron", "shape": "dot", "title": "Micron (Unrated)"}, {"color": "#fc8d59", "id": "Montage Technology", "label": "Montage Technology", "shape": "dot", "title": "Montage Technology (Medium)"}, {"color": "#bdbdbd", "id": "Suresh Vishnubhatla", "label": "Suresh Vishnubhatla", "shape": "dot", "title": "Suresh Vishnubhatla (Unrated)"}, {"color": "#bdbdbd", "id": "Isaac Lim", "label": "Isaac Lim", "shape": "dot", "title": "Isaac Lim (Unrated)"}, {"color": "#bdbdbd", "id": "ADATA Technology", "label": "ADATA Technology", "shape": "dot", "title": "ADATA Technology (Unrated)"}, {"color": "#bdbdbd", "id": "Justin Zacks", "label": "Justin Zacks", "shape": "dot", "title": "Justin Zacks (Unrated)"}, {"color": "#bdbdbd", "id": "Xi Jinping", "label": "Xi Jinping", "shape": "dot", "title": "Xi Jinping (Unrated)"}, {"color": "#bdbdbd", "id": "Erika Chiang", "label": "Erika Chiang", "shape": "dot", "title": "Erika Chiang (Unrated)"}, {"color": "#bdbdbd", "id": "Cape Venison \u0026 Biltong", "label": "Cape Venison \u0026 Biltong", "shape": "dot", "title": "Cape Venison \u0026 Biltong (Unrated)"}, {"color": "#bdbdbd", "id": "OpenHarmony", "label": "OpenHarmony", "shape": "dot", "title": "OpenHarmony (Unrated)"}, {"color": "#bdbdbd", "id": "Futu Holdings Limited", "label": "Futu Holdings Limited", "shape": "dot", "title": "Futu Holdings Limited (Unrated)"}, {"color": "#bdbdbd", "id": "Amanda Stein", "label": "Amanda Stein", "shape": "dot", "title": "Amanda Stein (Unrated)"}, {"color": "#bdbdbd", "id": "Gerard DiPippo", "label": "Gerard DiPippo", "shape": "dot", "title": "Gerard DiPippo (Unrated)"}, {"color": "#fc8d59", "id": "Sirio Pharma", "label": "Sirio Pharma", "shape": "dot", "title": "Sirio Pharma (Medium)"}, {"color": "#bdbdbd", "id": "Commonwealth", "label": "Commonwealth", "shape": "dot", "title": "Commonwealth (Unrated)"}, {"color": "#bdbdbd", "id": "Carol Xia", "label": "Carol Xia", "shape": "dot", "title": "Carol Xia (Unrated)"}, {"color": "#bdbdbd", "id": "Top Toy", "label": "Top Toy", "shape": "dot", "title": "Top Toy (Unrated)"}, {"color": "#bdbdbd", "id": "GXS Bank Pte. Ltd.", "label": "GXS Bank Pte. Ltd.", "shape": "dot", "title": "GXS Bank Pte. Ltd. (Unrated)"}, {"color": "#bdbdbd", "id": "Briggs \u0026 Riley", "label": "Briggs \u0026 Riley", "shape": "dot", "title": "Briggs \u0026 Riley (Unrated)"}, {"color": "#bdbdbd", "id": "Chris Meaney", "label": "Chris Meaney", "shape": "dot", "title": "Chris Meaney (Unrated)"}, {"color": "#bdbdbd", "id": "Mike Mahoney", "label": "Mike Mahoney", "shape": "dot", "title": "Mike Mahoney (Unrated)"}, {"color": "#bdbdbd", "id": "Zhang Jian", "label": "Zhang Jian", "shape": "dot", "title": "Zhang Jian (Unrated)"}, {"color": "#bdbdbd", "id": "CRYBABY", "label": "CRYBABY", "shape": "dot", "title": "CRYBABY (Unrated)"}, {"color": "#bdbdbd", "id": "Mitchell Ward", "label": "Mitchell Ward", "shape": "dot", "title": "Mitchell Ward (Unrated)"}, {"color": "#bdbdbd", "id": "Taiwan Semiconductor Manufacturing", "label": "Taiwan Semiconductor Manufacturing", "shape": "dot", "title": "Taiwan Semiconductor Manufacturing (Unrated)"}, {"color": "#bdbdbd", "id": "Huawei", "label": "Huawei", "shape": "dot", "title": "Huawei (Unrated)"}, {"color": "#bdbdbd", "id": "ApertureChina", "label": "ApertureChina", "shape": "dot", "title": "ApertureChina (Unrated)"}, {"color": "#bdbdbd", "id": "Paul Woolman", "label": "Paul Woolman", "shape": "dot", "title": "Paul Woolman (Unrated)"}, {"color": "#bdbdbd", "id": "Oclaro", "label": "Oclaro", "shape": "dot", "title": "Oclaro (Unrated)"}, {"color": "#bdbdbd", "id": "collectible designer toys", "label": "collectible designer toys", "shape": "dot", "title": "collectible designer toys (Unrated)"}, {"color": "#bdbdbd", "id": "Alphabet", "label": "Alphabet", "shape": "dot", "title": "Alphabet (Unrated)"}, {"color": "#bdbdbd", "id": "Huawei Technologies", "label": "Huawei Technologies", "shape": "dot", "title": "Huawei Technologies (Unrated)"}, {"color": "#bdbdbd", "id": "Edwards Lifesciences", "label": "Edwards Lifesciences", "shape": "dot", "title": "Edwards Lifesciences (Unrated)"}, {"color": "#bdbdbd", "id": "Sun Yuanwen", "label": "Sun Yuanwen", "shape": "dot", "title": "Sun Yuanwen (Unrated)"}, {"color": "#bdbdbd", "id": "Scott Chen", "label": "Scott Chen", "shape": "dot", "title": "Scott Chen (Unrated)"}, {"color": "#bdbdbd", "id": "Lovisa", "label": "Lovisa", "shape": "dot", "title": "Lovisa (Unrated)"}, {"color": "#bdbdbd", "id": "Performance Investment Partners", "label": "Performance Investment Partners", "shape": "dot", "title": "Performance Investment Partners (Unrated)"}, {"color": "#bdbdbd", "id": "Ye Guofu", "label": "Ye Guofu", "shape": "dot", "title": "Ye Guofu (Unrated)"}, {"color": "#bdbdbd", "id": "Moo Moo\u2019s Delights", "label": "Moo Moo\u2019s Delights", "shape": "dot", "title": "Moo Moo\u2019s Delights (Unrated)"}, {"color": "#bdbdbd", "id": "ASE Technology Holding Co Ltd", "label": "ASE Technology Holding Co Ltd", "shape": "dot", "title": "ASE Technology Holding Co Ltd (Unrated)"}, {"color": "#bdbdbd", "id": "Paul Pimlott", "label": "Paul Pimlott", "shape": "dot", "title": "Paul Pimlott (Unrated)"}, {"color": "#fc8d59", "id": "Pop Mart", "label": "Pop Mart", "shape": "dot", "title": "Pop Mart (Medium)"}, {"color": "#bdbdbd", "id": "Vimian Group", "label": "Vimian Group", "shape": "dot", "title": "Vimian Group (Unrated)"}, {"color": "#bdbdbd", "id": "The Vitamin Shoppe", "label": "The Vitamin Shoppe", "shape": "dot", "title": "The Vitamin Shoppe (Unrated)"}, {"color": "#bdbdbd", "id": "Innovalve Bio Medical", "label": "Innovalve Bio Medical", "shape": "dot", "title": "Innovalve Bio Medical (Unrated)"}, {"color": "#bdbdbd", "id": "Jay Hawk", "label": "Jay Hawk", "shape": "dot", "title": "Jay Hawk (Unrated)"}, {"color": "#bdbdbd", "id": "Futu Holdings", "label": "Futu Holdings", "shape": "dot", "title": "Futu Holdings (Unrated)"}, {"color": "#bdbdbd", "id": "Taiwan Semiconductor Manufacturing Company", "label": "Taiwan Semiconductor Manufacturing Company", "shape": "dot", "title": "Taiwan Semiconductor Manufacturing Company (Unrated)"}, {"color": "#bdbdbd", "id": "The Monsters", "label": "The Monsters", "shape": "dot", "title": "The Monsters (Unrated)"}, {"color": "#bdbdbd", "id": "Nvidia", "label": "Nvidia", "shape": "dot", "title": "Nvidia (Unrated)"}, {"color": "#bdbdbd", "id": "Boston Scientific", "label": "Boston Scientific", "shape": "dot", "title": "Boston Scientific (Unrated)"}, {"color": "#bdbdbd", "id": "Strawberry Shortcake", "label": "Strawberry Shortcake", "shape": "dot", "title": "Strawberry Shortcake (Unrated)"}, {"color": "#bdbdbd", "id": "Mariale \u00c1lvarez", "label": "Mariale \u00c1lvarez", "shape": "dot", "title": "Mariale \u00c1lvarez (Unrated)"}, {"color": "#bdbdbd", "id": "TOP TOY", "label": "TOP TOY", "shape": "dot", "title": "TOP TOY (Unrated)"}, {"color": "#bdbdbd", "id": "ManagePay Services Sdn Bhd", "label": "ManagePay Services Sdn Bhd", "shape": "dot", "title": "ManagePay Services Sdn Bhd (Unrated)"}, {"color": "#bdbdbd", "id": "ByteDance", "label": "ByteDance", "shape": "dot", "title": "ByteDance (Unrated)"}, {"color": "#bdbdbd", "id": "Rauan Khassan", "label": "Rauan Khassan", "shape": "dot", "title": "Rauan Khassan (Unrated)"}, {"color": "#bdbdbd", "id": "Libby", "label": "Libby", "shape": "dot", "title": "Libby (Unrated)"}, {"color": "#bdbdbd", "id": "not_specified", "label": "not_specified", "shape": "dot", "title": "not_specified (Unrated)"}, {"color": "#bdbdbd", "id": "Chow Sang Sang", "label": "Chow Sang Sang", "shape": "dot", "title": "Chow Sang Sang (Unrated)"}, {"color": "#bdbdbd", "id": "Disney ", "label": "Disney ", "shape": "dot", "title": "Disney  (Unrated)"}, {"color": "#bdbdbd", "id": "LABUBU", "label": "LABUBU", "shape": "dot", "title": "LABUBU (Unrated)"}, {"color": "#bdbdbd", "id": "SANGSIN EDP", "label": "SANGSIN EDP", "shape": "dot", "title": "SANGSIN EDP (Unrated)"}, {"color": "#bdbdbd", "id": "Samsung", "label": "Samsung", "shape": "dot", "title": "Samsung (Unrated)"}, {"color": "#bdbdbd", "id": "Haidilao International Holding", "label": "Haidilao International Holding", "shape": "dot", "title": "Haidilao International Holding (Unrated)"}, {"color": "#bdbdbd", "id": "Nucor", "label": "Nucor", "shape": "dot", "title": "Nucor (Unrated)"}, {"color": "#bdbdbd", "id": "HoYoverse", "label": "HoYoverse", "shape": "dot", "title": "HoYoverse (Unrated)"}, {"color": "#bdbdbd", "id": "Kuehne+Nagel", "label": "Kuehne+Nagel", "shape": "dot", "title": "Kuehne+Nagel (Unrated)"}, {"color": "#bdbdbd", "id": "Tesla", "label": "Tesla", "shape": "dot", "title": "Tesla (Unrated)"}, {"color": "#bdbdbd", "id": "Kasing Lung", "label": "Kasing Lung", "shape": "dot", "title": "Kasing Lung (Unrated)"}, {"color": "#bdbdbd", "id": "Sichuan Kelun-Biotech Biopharmaceutical", "label": "Sichuan Kelun-Biotech Biopharmaceutical", "shape": "dot", "title": "Sichuan Kelun-Biotech Biopharmaceutical (Unrated)"}, {"color": "#bdbdbd", "id": "Webull", "label": "Webull", "shape": "dot", "title": "Webull (Unrated)"}, {"color": "#bdbdbd", "id": "Beansprout", "label": "Beansprout", "shape": "dot", "title": "Beansprout (Unrated)"}, {"color": "#bdbdbd", "id": "Jeff Chambers", "label": "Jeff Chambers", "shape": "dot", "title": "Jeff Chambers (Unrated)"}, {"color": "#bdbdbd", "id": "Sun Lijuan", "label": "Sun Lijuan", "shape": "dot", "title": "Sun Lijuan (Unrated)"}, {"color": "#bdbdbd", "id": "FUTU Holdings", "label": "FUTU Holdings", "shape": "dot", "title": "FUTU Holdings (Unrated)"}, {"color": "#bdbdbd", "id": "WildBrain", "label": "WildBrain", "shape": "dot", "title": "WildBrain (Unrated)"}, {"color": "#bdbdbd", "id": "Wolfpack Games Studio", "label": "Wolfpack Games Studio", "shape": "dot", "title": "Wolfpack Games Studio (Unrated)"}, {"color": "#bdbdbd", "id": "N/A", "label": "N/A", "shape": "dot", "title": "N/A (Unrated)"}, {"color": "#bdbdbd", "id": "Moo Moo Express Car Wash", "label": "Moo Moo Express Car Wash", "shape": "dot", "title": "Moo Moo Express Car Wash (Unrated)"}, {"color": "#bdbdbd", "id": "Timothy Flacke", "label": "Timothy Flacke", "shape": "dot", "title": "Timothy Flacke (Unrated)"}, {"color": "#bdbdbd", "id": "Alessio de Longis", "label": "Alessio de Longis", "shape": "dot", "title": "Alessio de Longis (Unrated)"}, {"color": "#bdbdbd", "id": "Ian Huang", "label": "Ian Huang", "shape": "dot", "title": "Ian Huang (Unrated)"}, {"color": "#bdbdbd", "id": "Lexar", "label": "Lexar", "shape": "dot", "title": "Lexar (Unrated)"}, {"color": "#bdbdbd", "id": "Kingswood Capital Management", "label": "Kingswood Capital Management", "shape": "dot", "title": "Kingswood Capital Management (Unrated)"}, {"color": "#bdbdbd", "id": "Elon Musk", "label": "Elon Musk", "shape": "dot", "title": "Elon Musk (Unrated)"}, {"color": "#bdbdbd", "id": "Alex Du", "label": "Alex Du", "shape": "dot", "title": "Alex Du (Unrated)"}, {"color": "#bdbdbd", "id": "BMW", "label": "BMW", "shape": "dot", "title": "BMW (Unrated)"}, {"color": "#bdbdbd", "id": "Michael Arbus", "label": "Michael Arbus", "shape": "dot", "title": "Michael Arbus (Unrated)"}, {"color": "#bdbdbd", "id": "X", "label": "X", "shape": "dot", "title": "X (Unrated)"}, {"color": "#bdbdbd", "id": "Zhenyu Li", "label": "Zhenyu Li", "shape": "dot", "title": "Zhenyu Li (Unrated)"}, {"color": "#bdbdbd", "id": "Futu", "label": "Futu", "shape": "dot", "title": "Futu (Unrated)"}, {"color": "#bdbdbd", "id": "POPOP", "label": "POPOP", "shape": "dot", "title": "POPOP (Unrated)"}, {"color": "#bdbdbd", "id": "Riot Games", "label": "Riot Games", "shape": "dot", "title": "Riot Games (Unrated)"}, {"color": "#bdbdbd", "id": "Kevin Xu", "label": "Kevin Xu", "shape": "dot", "title": "Kevin Xu (Unrated)"}, {"color": "#bdbdbd", "id": "Miniso", "label": "Miniso", "shape": "dot", "title": "Miniso (Unrated)"}, {"color": "#bdbdbd", "id": "Santiago Desmery", "label": "Santiago Desmery", "shape": "dot", "title": "Santiago Desmery (Unrated)"}, {"color": "#bdbdbd", "id": "Shen Kaihong Digital", "label": "Shen Kaihong Digital", "shape": "dot", "title": "Shen Kaihong Digital (Unrated)"}, {"color": "#bdbdbd", "id": "Claire Chamberlain", "label": "Claire Chamberlain", "shape": "dot", "title": "Claire Chamberlain (Unrated)"}, {"color": "#bdbdbd", "id": "China Media Group", "label": "China Media Group", "shape": "dot", "title": "China Media Group (Unrated)"}, {"color": "#bdbdbd", "id": "Youyou Zhao", "label": "Youyou Zhao", "shape": "dot", "title": "Youyou Zhao (Unrated)"}, {"color": "#bdbdbd", "id": "Daniel Brennan", "label": "Daniel Brennan", "shape": "dot", "title": "Daniel Brennan (Unrated)"}, {"color": "#bdbdbd", "id": "FoloToy", "label": "FoloToy", "shape": "dot", "title": "FoloToy (Unrated)"}, {"color": "#bdbdbd", "id": "Reserve Bank", "label": "Reserve Bank", "shape": "dot", "title": "Reserve Bank (Unrated)"}, {"color": "#bdbdbd", "id": "Cambodia", "label": "Cambodia", "shape": "dot", "title": "Cambodia (Unrated)"}, {"color": "#bdbdbd", "id": "China International Television Corporation", "label": "China International Television Corporation", "shape": "dot", "title": "China International Television Corporation (Unrated)"}, {"color": "#bdbdbd", "id": "Robert Farrington", "label": "Robert Farrington", "shape": "dot", "title": "Robert Farrington (Unrated)"}, {"color": "#bdbdbd", "id": "PepsiCo", "label": "PepsiCo", "shape": "dot", "title": "PepsiCo (Unrated)"}, {"color": "#bdbdbd", "id": "THE MONSTERS", "label": "THE MONSTERS", "shape": "dot", "title": "THE MONSTERS (Unrated)"}, {"color": "#bdbdbd", "id": "Plus500", "label": "Plus500", "shape": "dot", "title": "Plus500 (Unrated)"}, {"color": "#bdbdbd", "id": "U.S.A.I.D.", "label": "U.S.A.I.D.", "shape": "dot", "title": "U.S.A.I.D. (Unrated)"}, {"color": "#bdbdbd", "id": "Midea Group", "label": "Midea Group", "shape": "dot", "title": "Midea Group (Unrated)"}, {"color": "#bdbdbd", "id": "Kathy Crawford", "label": "Kathy Crawford", "shape": "dot", "title": "Kathy Crawford (Unrated)"}, {"color": "#bdbdbd", "id": "Jessica Amir", "label": "Jessica Amir", "shape": "dot", "title": "Jessica Amir (Unrated)"}, {"color": "#bdbdbd", "id": "Nintendo", "label": "Nintendo", "shape": "dot", "title": "Nintendo (Unrated)"}, {"color": "#bdbdbd", "id": "Neil McDonald", "label": "Neil McDonald", "shape": "dot", "title": "Neil McDonald (Unrated)"}, {"color": "#bdbdbd", "id": "Karen Chen", "label": "Karen Chen", "shape": "dot", "title": "Karen Chen (Unrated)"}, {"color": "#bdbdbd", "id": "Gordon Chen", "label": "Gordon Chen", "shape": "dot", "title": "Gordon Chen (Unrated)"}, {"color": "#bdbdbd", "id": "Lopez Research", "label": "Lopez Research", "shape": "dot", "title": "Lopez Research (Unrated)"}, {"color": "#bdbdbd", "id": "Debra John", "label": "Debra John", "shape": "dot", "title": "Debra John (Unrated)"}, {"color": "#bdbdbd", "id": "Tencent", "label": "Tencent", "shape": "dot", "title": "Tencent (Unrated)"}, {"color": "#bdbdbd", "id": "Sirio Institute for Anti-Ageing", "label": "Sirio Institute for Anti-Ageing", "shape": "dot", "title": "Sirio Institute for Anti-Ageing (Unrated)"}, {"color": "#bdbdbd", "id": "margin trading", "label": "margin trading", "shape": "dot", "title": "margin trading (Unrated)"}, {"color": "#bdbdbd", "id": "Tesla fractional shares", "label": "Tesla fractional shares", "shape": "dot", "title": "Tesla fractional shares (Unrated)"}, {"color": "#bdbdbd", "id": "Syngenta", "label": "Syngenta", "shape": "dot", "title": "Syngenta (Unrated)"}, {"color": "#bdbdbd", "id": "New York Mets", "label": "New York Mets", "shape": "dot", "title": "New York Mets (Unrated)"}, {"color": "#bdbdbd", "id": "GXBank", "label": "GXBank", "shape": "dot", "title": "GXBank (Unrated)"}, {"color": "#bdbdbd", "id": "Country Garden", "label": "Country Garden", "shape": "dot", "title": "Country Garden (Unrated)"}, {"color": "#bdbdbd", "id": "Insilico Medicine", "label": "Insilico Medicine", "shape": "dot", "title": "Insilico Medicine (Unrated)"}, {"color": "#bdbdbd", "id": "SM2320", "label": "SM2320", "shape": "dot", "title": "SM2320 (Unrated)"}, {"color": "#bdbdbd", "id": "Maribel Lopez", "label": "Maribel Lopez", "shape": "dot", "title": "Maribel Lopez (Unrated)"}, {"color": "#bdbdbd", "id": "Ana Escalante", "label": "Ana Escalante", "shape": "dot", "title": "Ana Escalante (Unrated)"}, {"color": "#bdbdbd", "id": "A320-214", "label": "A320-214", "shape": "dot", "title": "A320-214 (Unrated)"}, {"color": "#bdbdbd", "id": "Seeking Alpha", "label": "Seeking Alpha", "shape": "dot", "title": "Seeking Alpha (Unrated)"}, {"color": "#bdbdbd", "id": "Stephen Wang", "label": "Stephen Wang", "shape": "dot", "title": "Stephen Wang (Unrated)"}, {"color": "#bdbdbd", "id": "Evelyn Reinson", "label": "Evelyn Reinson", "shape": "dot", "title": "Evelyn Reinson (Unrated)"}, {"color": "#bdbdbd", "id": "BIWIN STORAGE TECHNOLOGY", "label": "BIWIN STORAGE TECHNOLOGY", "shape": "dot", "title": "BIWIN STORAGE TECHNOLOGY (Unrated)"}, {"color": "#bdbdbd", "id": "Not specified", "label": "Not specified", "shape": "dot", "title": "Not specified (Unrated)"}, {"color": "#bdbdbd", "id": "Cadence Design Systems, Inc.", "label": "Cadence Design Systems, Inc.", "shape": "dot", "title": "Cadence Design Systems, Inc. (Unrated)"}, {"color": "#bdbdbd", "id": "Manish Kabra", "label": "Manish Kabra", "shape": "dot", "title": "Manish Kabra (Unrated)"}, {"color": "#bdbdbd", "id": "DJ Collins", "label": "DJ Collins", "shape": "dot", "title": "DJ Collins (Unrated)"}, {"color": "#bdbdbd", "id": "Engel \u0026 V\u00f6lkers Middle East", "label": "Engel \u0026 V\u00f6lkers Middle East", "shape": "dot", "title": "Engel \u0026 V\u00f6lkers Middle East (Unrated)"}, {"color": "#bdbdbd", "id": "MOLLY", "label": "MOLLY", "shape": "dot", "title": "MOLLY (Unrated)"}, {"color": "#bdbdbd", "id": "In the Night Garden", "label": "In the Night Garden", "shape": "dot", "title": "In the Night Garden (Unrated)"}, {"color": "#bdbdbd", "id": "Hey Juj", "label": "Hey Juj", "shape": "dot", "title": "Hey Juj (Unrated)"}, {"color": "#bdbdbd", "id": "M. Scott Havens", "label": "M. Scott Havens", "shape": "dot", "title": "M. Scott Havens (Unrated)"}, {"color": "#bdbdbd", "id": "Pat Gelsinger", "label": "Pat Gelsinger", "shape": "dot", "title": "Pat Gelsinger (Unrated)"}, {"color": "#bdbdbd", "id": "Frank Pun", "label": "Frank Pun", "shape": "dot", "title": "Frank Pun (Unrated)"}, {"color": "#bdbdbd", "id": "Labubu", "label": "Labubu", "shape": "dot", "title": "Labubu (Unrated)"}, {"color": "#bdbdbd", "id": "4C Medical Technologies Inc.", "label": "4C Medical Technologies Inc.", "shape": "dot", "title": "4C Medical Technologies Inc. (Unrated)"}, {"color": "#bdbdbd", "id": "Green Bioactives", "label": "Green Bioactives", "shape": "dot", "title": "Green Bioactives (Unrated)"}, {"color": "#bdbdbd", "id": "Ivan Mok", "label": "Ivan Mok", "shape": "dot", "title": "Ivan Mok (Unrated)"}, {"color": "#bdbdbd", "id": "Rick de los Reyes", "label": "Rick de los Reyes", "shape": "dot", "title": "Rick de los Reyes (Unrated)"}, {"color": "#fc8d59", "id": "MooMoo", "label": "MooMoo", "shape": "dot", "title": "MooMoo (Medium)"}, {"color": "#bdbdbd", "id": "Invesco Solutions", "label": "Invesco Solutions", "shape": "dot", "title": "Invesco Solutions (Unrated)"}, {"color": "#bdbdbd", "id": "SM2508", "label": "SM2508", "shape": "dot", "title": "SM2508 (Unrated)"}, {"color": "#bdbdbd", "id": "Quantum Catalyzer", "label": "Quantum Catalyzer", "shape": "dot", "title": "Quantum Catalyzer (Unrated)"}, {"color": "#bdbdbd", "id": "SK hynix", "label": "SK hynix", "shape": "dot", "title": "SK hynix (Unrated)"}, {"color": "#bdbdbd", "id": "Wang Ning", "label": "Wang Ning", "shape": "dot", "title": "Wang Ning (Unrated)"}, {"color": "#bdbdbd", "id": "Unnamed Founder", "label": "Unnamed Founder", "shape": "dot", "title": "Unnamed Founder (Unrated)"}, {"color": "#bdbdbd", "id": "Calzedonia | Intimissimi", "label": "Calzedonia | Intimissimi", "shape": "dot", "title": "Calzedonia | Intimissimi (Unrated)"}, {"color": "#bdbdbd", "id": "BlackRock Foundation", "label": "BlackRock Foundation", "shape": "dot", "title": "BlackRock Foundation (Unrated)"}, {"color": "#bdbdbd", "id": "Finisar", "label": "Finisar", "shape": "dot", "title": "Finisar (Unrated)"}, {"color": "#bdbdbd", "id": "Daniel Hadi", "label": "Daniel Hadi", "shape": "dot", "title": "Daniel Hadi (Unrated)"}, {"color": "#bdbdbd", "id": "Chorus", "label": "Chorus", "shape": "dot", "title": "Chorus (Unrated)"}, {"color": "#bdbdbd", "id": "Neil Shah", "label": "Neil Shah", "shape": "dot", "title": "Neil Shah (Unrated)"}, {"color": "#bdbdbd", "id": "ManagePay Systems Bhd", "label": "ManagePay Systems Bhd", "shape": "dot", "title": "ManagePay Systems Bhd (Unrated)"}, {"color": "#bdbdbd", "id": "Tiger Brokers", "label": "Tiger Brokers", "shape": "dot", "title": "Tiger Brokers (Unrated)"}, {"color": "#bdbdbd", "id": "Oriental Kopi Holdings Bhd", "label": "Oriental Kopi Holdings Bhd", "shape": "dot", "title": "Oriental Kopi Holdings Bhd (Unrated)"}, {"color": "#fc8d59", "id": "Linklogis Inc.", "label": "Linklogis Inc.", "shape": "dot", "title": "Linklogis Inc. (Medium)"}, {"color": "#bdbdbd", "id": "BIWIN Storage Technology", "label": "BIWIN Storage Technology", "shape": "dot", "title": "BIWIN Storage Technology (Unrated)"}, {"color": "#bdbdbd", "id": "Eugene Knopp", "label": "Eugene Knopp", "shape": "dot", "title": "Eugene Knopp (Unrated)"}, {"color": "#bdbdbd", "id": "ChangXin Memory Technologies", "label": "ChangXin Memory Technologies", "shape": "dot", "title": "ChangXin Memory Technologies (Unrated)"}, {"color": "#bdbdbd", "id": "FSMOne", "label": "FSMOne", "shape": "dot", "title": "FSMOne (Unrated)"}, {"color": "#bdbdbd", "id": "Ken Low", "label": "Ken Low", "shape": "dot", "title": "Ken Low (Unrated)"}, {"color": "#bdbdbd", "id": "WoFactory", "label": "WoFactory", "shape": "dot", "title": "WoFactory (Unrated)"}, {"color": "#bdbdbd", "id": "Oriental Kopi", "label": "Oriental Kopi", "shape": "dot", "title": "Oriental Kopi (Unrated)"}, {"color": "#bdbdbd", "id": "Sara Lesina", "label": "Sara Lesina", "shape": "dot", "title": "Sara Lesina (Unrated)"}, {"color": "#bdbdbd", "id": "SKULLPANDA", "label": "SKULLPANDA", "shape": "dot", "title": "SKULLPANDA (Unrated)"}, {"color": "#bdbdbd", "id": "Who What Wear", "label": "Who What Wear", "shape": "dot", "title": "Who What Wear (Unrated)"}, {"color": "#bdbdbd", "id": "KeyMavens Real Estate Development", "label": "KeyMavens Real Estate Development", "shape": "dot", "title": "KeyMavens Real Estate Development (Unrated)"}, {"color": "#bdbdbd", "id": "WonderPort Collectibles", "label": "WonderPort Collectibles", "shape": "dot", "title": "WonderPort Collectibles (Unrated)"}, {"color": "#bdbdbd", "id": "Intel", "label": "Intel", "shape": "dot", "title": "Intel (Unrated)"}, {"color": "#bdbdbd", "id": "Montage Partners", "label": "Montage Partners", "shape": "dot", "title": "Montage Partners (Unrated)"}, {"color": "#bdbdbd", "id": "Loong Air", "label": "Loong Air", "shape": "dot", "title": "Loong Air (Unrated)"}, {"color": "#bdbdbd", "id": "Bob Chapek", "label": "Bob Chapek", "shape": "dot", "title": "Bob Chapek (Unrated)"}, {"color": "#bdbdbd", "id": "CME Group", "label": "CME Group", "shape": "dot", "title": "CME Group (Unrated)"}, {"color": "#bdbdbd", "id": "unknown", "label": "unknown", "shape": "dot", "title": "unknown (Unrated)"}, {"color": "#bdbdbd", "id": "Silicon Motion Technology", "label": "Silicon Motion Technology", "shape": "dot", "title": "Silicon Motion Technology (Unrated)"}, {"color": "#bdbdbd", "id": "SLAC Precision Equipment", "label": "SLAC Precision Equipment", "shape": "dot", "title": "SLAC Precision Equipment (Unrated)"}, {"color": "#bdbdbd", "id": "Robinhood", "label": "Robinhood", "shape": "dot", "title": "Robinhood (Unrated)"}, {"color": "#bdbdbd", "id": "Wen Deyi", "label": "Wen Deyi", "shape": "dot", "title": "Wen Deyi (Unrated)"}, {"color": "#bdbdbd", "id": "Jeff Crawford", "label": "Jeff Crawford", "shape": "dot", "title": "Jeff Crawford (Unrated)"}, {"color": "#bdbdbd", "id": "RAND China Research Center", "label": "RAND China Research Center", "shape": "dot", "title": "RAND China Research Center (Unrated)"}, {"color": "#bdbdbd", "id": "stadium in C\u00f4te d\u0027Ivoire", "label": "stadium in C\u00f4te d\u0027Ivoire", "shape": "dot", "title": "stadium in C\u00f4te d\u0027Ivoire (Unrated)"}, {"color": "#bdbdbd", "id": "MINISO", "label": "MINISO", "shape": "dot", "title": "MINISO (Unrated)"}, {"color": "#bdbdbd", "id": "Harmony OS", "label": "Harmony OS", "shape": "dot", "title": "Harmony OS (Unrated)"}, {"color": "#bdbdbd", "id": "Jason Kiszonak", "label": "Jason Kiszonak", "shape": "dot", "title": "Jason Kiszonak (Unrated)"}, {"color": "#bdbdbd", "id": "Express Wash Concepts", "label": "Express Wash Concepts", "shape": "dot", "title": "Express Wash Concepts (Unrated)"}, {"color": "#bdbdbd", "id": "SRW Laboratories", "label": "SRW Laboratories", "shape": "dot", "title": "SRW Laboratories (Unrated)"}, {"color": "#bdbdbd", "id": "Robert Buchanan", "label": "Robert Buchanan", "shape": "dot", "title": "Robert Buchanan (Unrated)"}, {"color": "#bdbdbd", "id": "Dan Capital Management Ltd.", "label": "Dan Capital Management Ltd.", "shape": "dot", "title": "Dan Capital Management Ltd. (Unrated)"}, {"color": "#bdbdbd", "id": "Good Money Guide", "label": "Good Money Guide", "shape": "dot", "title": "Good Money Guide (Unrated)"}, {"color": "#bdbdbd", "id": "Gavin Chia", "label": "Gavin Chia", "shape": "dot", "title": "Gavin Chia (Unrated)"}, {"color": "#bdbdbd", "id": "Hyperfine, Inc.", "label": "Hyperfine, Inc.", "shape": "dot", "title": "Hyperfine, Inc. (Unrated)"}, {"color": "#bdbdbd", "id": "Fanxiang", "label": "Fanxiang", "shape": "dot", "title": "Fanxiang (Unrated)"}, {"color": "#bdbdbd", "id": "John Roush", "label": "John Roush", "shape": "dot", "title": "John Roush (Unrated)"}, {"color": "#bdbdbd", "id": "Innovent Biologics", "label": "Innovent Biologics", "shape": "dot", "title": "Innovent Biologics (Unrated)"}, {"color": "#bdbdbd", "id": "Dr Tien Wu", "label": "Dr Tien Wu", "shape": "dot", "title": "Dr Tien Wu (Unrated)"}, {"color": "#bdbdbd", "id": "IJ Reportika", "label": "IJ Reportika", "shape": "dot", "title": "IJ Reportika (Unrated)"}, {"color": "#bdbdbd", "id": "Kedali Industry", "label": "Kedali Industry", "shape": "dot", "title": "Kedali Industry (Unrated)"}, {"color": "#bdbdbd", "id": "Oculus Sunglass Boutique", "label": "Oculus Sunglass Boutique", "shape": "dot", "title": "Oculus Sunglass Boutique (Unrated)"}, {"color": "#bdbdbd", "id": "Pei-Si Lai", "label": "Pei-Si Lai", "shape": "dot", "title": "Pei-Si Lai (Unrated)"}, {"color": "#bdbdbd", "id": "Robinhood Markets, Inc.", "label": "Robinhood Markets, Inc.", "shape": "dot", "title": "Robinhood Markets, Inc. (Unrated)"}, {"color": "#bdbdbd", "id": "Sun Wenke", "label": "Sun Wenke", "shape": "dot", "title": "Sun Wenke (Unrated)"}, {"color": "#bdbdbd", "id": "Sarah Horvath", "label": "Sarah Horvath", "shape": "dot", "title": "Sarah Horvath (Unrated)"}, {"color": "#bdbdbd", "id": "Interconnected Capital", "label": "Interconnected Capital", "shape": "dot", "title": "Interconnected Capital (Unrated)"}, {"color": "#bdbdbd", "id": "Webull Singapore", "label": "Webull Singapore", "shape": "dot", "title": "Webull Singapore (Unrated)"}, {"color": "#bdbdbd", "id": "4C Medical", "label": "4C Medical", "shape": "dot", "title": "4C Medical (Unrated)"}, {"color": "#bdbdbd", "id": "MASE Events", "label": "MASE Events", "shape": "dot", "title": "MASE Events (Unrated)"}, {"color": "#bdbdbd", "id": "Jensen Huang", "label": "Jensen Huang", "shape": "dot", "title": "Jensen Huang (Unrated)"}, {"color": "#fc8d59", "id": "Chinasoft International", "label": "Chinasoft International", "shape": "dot", "title": "Chinasoft International (Medium)"}, {"color": "#bdbdbd", "id": "Acer", "label": "Acer", "shape": "dot", "title": "Acer (Unrated)"}, {"color": "#bdbdbd", "id": "Richard Lin", "label": "Richard Lin", "shape": "dot", "title": "Richard Lin (Unrated)"}, {"color": "#bdbdbd", "id": "Chow Tai Fook", "label": "Chow Tai Fook", "shape": "dot", "title": "Chow Tai Fook (Unrated)"}, {"color": "#bdbdbd", "id": "Justin Moon", "label": "Justin Moon", "shape": "dot", "title": "Justin Moon (Unrated)"}, {"color": "#bdbdbd", "id": "Andrew Hauser", "label": "Andrew Hauser", "shape": "dot", "title": "Andrew Hauser (Unrated)"}, {"color": "#bdbdbd", "id": "Shenzhen Kaihong Digital Industry Development Co.", "label": "Shenzhen Kaihong Digital Industry Development Co.", "shape": "dot", "title": "Shenzhen Kaihong Digital Industry Development Co. (Unrated)"}, {"color": "#bdbdbd", "id": "T Rowe Price", "label": "T Rowe Price", "shape": "dot", "title": "T Rowe Price (Unrated)"}, {"color": "#bdbdbd", "id": "The Gorge Bear Company", "label": "The Gorge Bear Company", "shape": "dot", "title": "The Gorge Bear Company (Unrated)"}, {"color": "#bdbdbd", "id": "Julie Hawk", "label": "Julie Hawk", "shape": "dot", "title": "Julie Hawk (Unrated)"}, {"color": "#bdbdbd", "id": "Yu-Xuan Lyu", "label": "Yu-Xuan Lyu", "shape": "dot", "title": "Yu-Xuan Lyu (Unrated)"}, {"color": "#bdbdbd", "id": "Vladimir Tenev", "label": "Vladimir Tenev", "shape": "dot", "title": "Vladimir Tenev (Unrated)"}, {"color": "#bdbdbd", "id": "Larry Lu", "label": "Larry Lu", "shape": "dot", "title": "Larry Lu (Unrated)"}, {"color": "#bdbdbd", "id": "Wang Le", "label": "Wang Le", "shape": "dot", "title": "Wang Le (Unrated)"}, {"color": "#bdbdbd", "id": "Joshua Enomoto", "label": "Joshua Enomoto", "shape": "dot", "title": "Joshua Enomoto (Unrated)"}, {"color": "#bdbdbd", "id": "Invesco", "label": "Invesco", "shape": "dot", "title": "Invesco (Unrated)"}, {"color": "#bdbdbd", "id": "Dustin Wei", "label": "Dustin Wei", "shape": "dot", "title": "Dustin Wei (Unrated)"}, {"color": "#bdbdbd", "id": "Epic Games", "label": "Epic Games", "shape": "dot", "title": "Epic Games (Unrated)"}, {"color": "#bdbdbd", "id": "POEMS", "label": "POEMS", "shape": "dot", "title": "POEMS (Unrated)"}, {"color": "#bdbdbd", "id": "Miracle Mile Shops", "label": "Miracle Mile Shops", "shape": "dot", "title": "Miracle Mile Shops (Unrated)"}, {"color": "#bdbdbd", "id": "Lumentum", "label": "Lumentum", "shape": "dot", "title": "Lumentum (Unrated)"}, {"color": "#bdbdbd", "id": "Futu Holdings Ltd.", "label": "Futu Holdings Ltd.", "shape": "dot", "title": "Futu Holdings Ltd. (Unrated)"}, {"color": "#bdbdbd", "id": "Charles Song", "label": "Charles Song", "shape": "dot", "title": "Charles Song (Unrated)"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "Pop Mart", "label": "owns (created_character)\nowns (majority_ownership)\nowns (sole_mass_market_distributor)", "title": "owns (created_character)\nowns (majority_ownership)\nowns (sole_mass_market_distributor)", "to": "Labubu"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (CEO)\nhas_executive (creator)\nhas_executive (founder)\ninvested_in (collectible_toys)\nowns (licensing_agreement)", "title": "has_executive (CEO)\nhas_executive (creator)\nhas_executive (founder)\ninvested_in (collectible_toys)\nowns (licensing_agreement)", "to": "Kasing Lung"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (CEO)\nhas_executive (Founder)\nhas_executive (founder)", "title": "has_executive (CEO)\nhas_executive (Founder)\nhas_executive (founder)", "to": "Wang Ning"}, {"arrows": "to", "from": "II-VI Incorporated", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "Finisar"}, {"arrows": "to", "from": "Lumentum", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "Oclaro"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (chief_consumer_analyst)", "title": "has_executive (chief_consumer_analyst)", "to": "Richard Lin"}, {"arrows": "to", "from": "Chinasoft International", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Yuhong Chen"}, {"arrows": "to", "from": "Dan Capital Management Ltd.", "label": "owns (stake)", "title": "owns (stake)", "to": "Chinasoft International"}, {"arrows": "to", "from": "UBS Asset Management AG", "label": "owns (stake)", "title": "owns (stake)", "to": "Chinasoft International"}, {"arrows": "to", "from": "Montage Technology", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "ChangXin Memory Technologies"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (executive_member)", "title": "has_executive (executive_member)", "to": "PricewaterhouseCoopers"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (vice president)", "title": "has_executive (vice president)", "to": "Karen Chen"}, {"arrows": "to", "from": "Cadence Design Systems, Inc.", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Taiwan Semiconductor Manufacturing"}, {"arrows": "to", "from": "Cadence Design Systems, Inc.", "label": "has_executive (executive_affiliation)", "title": "has_executive (executive_affiliation)", "to": "Micron"}, {"arrows": "to", "from": "Cadence Design Systems, Inc.", "label": "has_executive (executive_affiliation)", "title": "has_executive (executive_affiliation)", "to": "Montage Technology"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (spokesman)\nowns (majority_ownership)", "title": "has_executive (spokesman)\nowns (majority_ownership)", "to": "Pop Mart"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Debra John"}, {"arrows": "to", "from": "Pop Mart", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "Riot Games"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (head)\nhas_executive (licensing_head)", "title": "has_executive (head)\nhas_executive (licensing_head)", "to": "Emily Brough"}, {"arrows": "to", "from": "Riot Games", "label": "has_executive (not_specified)", "title": "has_executive (not_specified)", "to": "not_specified"}, {"arrows": "to", "from": "Kingswood Capital Management", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "The Vitamin Shoppe"}, {"arrows": "to", "from": "Performance Investment Partners", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "The Vitamin Shoppe"}, {"arrows": "to", "from": "Green Bioactives", "label": "has_executive (chief_business_officer)", "title": "has_executive (chief_business_officer)", "to": "Chris Meaney"}, {"arrows": "to", "from": "Sirio Pharma", "label": "has_executive (assistant_vice_president)", "title": "has_executive (assistant_vice_president)", "to": "Youyou Zhao"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Zhang Jian"}, {"arrows": "to", "from": "Disney ", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Bob Chapek"}, {"arrows": "to", "from": "ManagePay Systems Bhd", "label": "owns (joint_venture)", "title": "owns (joint_venture)", "to": "Chinasoft International"}, {"arrows": "to", "from": "ManagePay Services Sdn Bhd", "label": "owns (joint_venture)", "title": "owns (joint_venture)", "to": "Chinasoft International"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "The Monsters"}, {"arrows": "to", "from": "Who What Wear", "label": "has_executive (Editor)", "title": "has_executive (Editor)", "to": "Ana Escalante"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (spokesperson)", "title": "has_executive (spokesperson)", "to": "unknown"}, {"arrows": "to", "from": "The Gorge Bear Company", "label": "has_executive (company secretary)", "title": "has_executive (company secretary)", "to": "Paul Pimlott"}, {"arrows": "to", "from": "Alphabet", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Chorus"}, {"arrows": "to", "from": "Chorus", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Suresh Vishnubhatla"}, {"arrows": "to", "from": "Kuehne+Nagel", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "Chorus"}, {"arrows": "to", "from": "WildBrain", "label": "has_executive (vice_president)", "title": "has_executive (vice_president)", "to": "Erin Morris"}, {"arrows": "to", "from": "WildBrain", "label": "owns (franchise)", "title": "owns (franchise)", "to": "Teletubbies"}, {"arrows": "to", "from": "WildBrain", "label": "owns (franchise)", "title": "owns (franchise)", "to": "Strawberry Shortcake"}, {"arrows": "to", "from": "WildBrain", "label": "owns (franchise)", "title": "owns (franchise)", "to": "In the Night Garden"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Wang Le"}, {"arrows": "to", "from": "FoloToy", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Wang Le"}, {"arrows": "to", "from": "WoFactory", "label": "has_executive (president)", "title": "has_executive (president)", "to": "Sun Wenke"}, {"arrows": "to", "from": "WoFactory", "label": "has_executive (owner)", "title": "has_executive (owner)", "to": "Sun Lijuan"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (co-chief operating officer)", "title": "has_executive (co-chief operating officer)", "to": "Justin Moon"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (unknown)", "title": "has_executive (unknown)", "to": "Sarah Horvath"}, {"arrows": "to", "from": "Linklogis Inc.", "label": "has_executive (executive)", "title": "has_executive (executive)", "to": "unknown"}, {"arrows": "to", "from": "M1 Finance", "label": "has_executive (author)", "title": "has_executive (author)", "to": "Joshua Enomoto"}, {"arrows": "to", "from": "Interconnected Capital", "label": "has_executive (Founder)", "title": "has_executive (Founder)", "to": "Kevin Xu"}, {"arrows": "to", "from": "ApertureChina", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Yaling Jiang"}, {"arrows": "to", "from": "RAND China Research Center", "label": "has_executive (Acting Associate Director)", "title": "has_executive (Acting Associate Director)", "to": "Gerard DiPippo"}, {"arrows": "to", "from": "TikTok", "label": "owns (Created by)", "title": "owns (Created by)", "to": "ByteDance"}, {"arrows": "to", "from": "Miniso", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Ye Guofu"}, {"arrows": "to", "from": "Top Toy", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Sun Yuanwen"}, {"arrows": "to", "from": "MooMoo", "label": "owns (affiliated_company)\nowns (majority_ownership)\nowns (subsidiary)", "title": "owns (affiliated_company)\nowns (majority_ownership)\nowns (subsidiary)", "to": "MooMoo"}, {"arrows": "to", "from": "Webull Singapore", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Webull"}, {"arrows": "to", "from": "Tiger Brokers", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Tiger Brokers"}, {"arrows": "to", "from": "FSMOne", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "FSMOne"}, {"arrows": "to", "from": "POEMS", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "POEMS"}, {"arrows": "to", "from": "Chinasoft International", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Shenzhen Kaihong Digital Industry Development Co."}, {"arrows": "to", "from": "Huawei Technologies", "label": "owns (ownership_of_OS)", "title": "owns (ownership_of_OS)", "to": "Harmony OS"}, {"arrows": "to", "from": "Chinasoft International", "label": "has_executive (associate)", "title": "has_executive (associate)", "to": "Shen Kaihong Digital"}, {"arrows": "to", "from": "Huawei", "label": "owns (operating_system)", "title": "owns (operating_system)", "to": "OpenHarmony"}, {"arrows": "to", "from": "Kedali Industry", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "SANGSIN EDP"}, {"arrows": "to", "from": "Kedali Industry", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "SLAC Precision Equipment"}, {"arrows": "to", "from": "SANGSIN EDP", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Kedali Industry"}, {"arrows": "to", "from": "SANGSIN EDP", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "SLAC Precision Equipment"}, {"arrows": "to", "from": "SLAC Precision Equipment", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Kedali Industry"}, {"arrows": "to", "from": "SLAC Precision Equipment", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "SANGSIN EDP"}, {"arrows": "to", "from": "Plus500", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "N/A"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (N/A)", "title": "has_executive (N/A)", "to": "N/A"}, {"arrows": "to", "from": "E*TRADE", "label": "owns (N/A)", "title": "owns (N/A)", "to": "N/A"}, {"arrows": "to", "from": "Robinhood", "label": "owns (N/A)", "title": "owns (N/A)", "to": "N/A"}, {"arrows": "to", "from": "Webull", "label": "owns (N/A)", "title": "owns (N/A)", "to": "N/A"}, {"arrows": "to", "from": "Fidelity", "label": "owns (N/A)", "title": "owns (N/A)", "to": "N/A"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (storefront)", "title": "owns (storefront)", "to": "Miracle Mile Shops"}, {"arrows": "to", "from": "Calzedonia | Intimissimi", "label": "owns (storefront)", "title": "owns (storefront)", "to": "Miracle Mile Shops"}, {"arrows": "to", "from": "Lovisa", "label": "owns (storefront)", "title": "owns (storefront)", "to": "Miracle Mile Shops"}, {"arrows": "to", "from": "Briggs \u0026 Riley", "label": "owns (storefront)", "title": "owns (storefront)", "to": "Miracle Mile Shops"}, {"arrows": "to", "from": "Oculus Sunglass Boutique", "label": "owns (storefront)", "title": "owns (storefront)", "to": "Miracle Mile Shops"}, {"arrows": "to", "from": "Miracle Mile Shops", "label": "has_executive (general_manager)", "title": "has_executive (general_manager)", "to": "Robert Buchanan"}, {"arrows": "to", "from": "Innovent Biologics", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Sichuan Kelun-Biotech Biopharmaceutical"}, {"arrows": "to", "from": "Futu Holdings Ltd.", "label": "owns (majority_ownership)\nowns (parent_company)", "title": "owns (majority_ownership)\nowns (parent_company)", "to": "MooMoo"}, {"arrows": "to", "from": "Dan Schmidt", "label": "has_executive (writer)", "title": "has_executive (writer)", "to": "MooMoo"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "TOP TOY"}, {"arrows": "to", "from": "MINISO", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "TOP TOY"}, {"arrows": "to", "from": "TOP TOY", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Sun Yuanwen"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Beansprout"}, {"arrows": "to", "from": "Tesla", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Tesla fractional shares"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Ivan Mok"}, {"arrows": "to", "from": "TheFXperts", "label": "has_executive (Co-founder)", "title": "has_executive (Co-founder)", "to": "Julie Hawk"}, {"arrows": "to", "from": "TheFXperts", "label": "has_executive (Co-founder)", "title": "has_executive (Co-founder)", "to": "Jay Hawk"}, {"arrows": "to", "from": "MooMoo", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Futu Holdings Ltd"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (CEO)\nhas_executive (US CEO)", "title": "has_executive (CEO)\nhas_executive (US CEO)", "to": "Neil McDonald"}, {"arrows": "to", "from": "New York Mets", "label": "has_executive (President of Business Operations)", "title": "has_executive (President of Business Operations)", "to": "M. Scott Havens"}, {"arrows": "to", "from": "Nintendo", "label": "has_executive (executive)", "title": "has_executive (executive)", "to": "Shuntaro Furukawa"}, {"arrows": "to", "from": "MooMoo", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "New York Mets"}, {"arrows": "to", "from": "Futu Holdings", "label": "owns (parent_company)\nowns (subsidiary)", "title": "owns (parent_company)\nowns (subsidiary)", "to": "MooMoo"}, {"arrows": "to", "from": "Moo Moo\u2019s Delights", "label": "has_executive (owner)", "title": "has_executive (owner)", "to": "Kathy Crawford"}, {"arrows": "to", "from": "Moo Moo\u2019s Delights", "label": "has_executive (owner)", "title": "has_executive (owner)", "to": "Jeff Crawford"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (executive if mentioned)", "title": "has_executive (executive if mentioned)", "to": "not specified"}, {"arrows": "to", "from": "MooMoo", "label": "owns (subsidiary)", "title": "owns (subsidiary)", "to": "Futu Holdings Ltd."}, {"arrows": "to", "from": "Sirio Institute for Anti-Ageing", "label": "has_executive (assistant_vice_president)", "title": "has_executive (assistant_vice_president)", "to": "Youyou Zhao"}, {"arrows": "to", "from": "Sirio Institute for Anti-Ageing", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Yu-Xuan Lyu"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (editor)", "title": "has_executive (editor)", "to": "Colin Graves"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (reviewer)", "title": "has_executive (reviewer)", "to": "Robert Farrington"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (head_of_North_America)", "title": "has_executive (head_of_North_America)", "to": "Larry Lu"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (Company representative)\nhas_executive (Executive)", "title": "has_executive (Company representative)\nhas_executive (Executive)", "to": "Libby"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "THE MONSTERS"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "MOLLY"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "SKULLPANDA"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "CRYBABY"}, {"arrows": "to", "from": "Linklogis Inc.", "label": "has_executive (Founder, Chairman, and CEO)", "title": "has_executive (Founder, Chairman, and CEO)", "to": "Charles Song"}, {"arrows": "to", "from": "Linklogis Inc.", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "Shenzhen Bytter Technology Co., Ltd."}, {"arrows": "to", "from": "Wolfpack Games Studio", "label": "has_executive (co-founder)", "title": "has_executive (co-founder)", "to": "Stephen Wang"}, {"arrows": "to", "from": "MooMoo", "label": "owns (subsidiary)", "title": "owns (subsidiary)", "to": "Futu Holdings"}, {"arrows": "to", "from": "Robinhood", "label": "owns (parent_company)", "title": "owns (parent_company)", "to": "Robinhood Markets, Inc."}, {"arrows": "to", "from": "Futu Holdings", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Gordon Chen"}, {"arrows": "to", "from": "Robinhood", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Vladimir Tenev"}, {"arrows": "to", "from": "Syngenta", "label": "has_executive (Head Sustainability \u0026 Corporate Affairs LATAM)", "title": "has_executive (Head Sustainability \u0026 Corporate Affairs LATAM)", "to": "Mariale \u00c1lvarez"}, {"arrows": "to", "from": "PepsiCo", "label": "has_executive (Oils Category Leader)", "title": "has_executive (Oils Category Leader)", "to": "Santiago Desmery"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Not specified"}, {"arrows": "to", "from": "Haidilao International Holding", "label": "has_executive (Not specified)", "title": "has_executive (Not specified)", "to": "Not specified"}, {"arrows": "to", "from": "Nongfu Spring", "label": "has_executive (Not specified)", "title": "has_executive (Not specified)", "to": "Not specified"}, {"arrows": "to", "from": "Midea Group", "label": "has_executive (Not specified)", "title": "has_executive (Not specified)", "to": "Not specified"}, {"arrows": "to", "from": "Country Garden", "label": "has_executive (Not specified)", "title": "has_executive (Not specified)", "to": "Not specified"}, {"arrows": "to", "from": "Sirio Pharma", "label": "has_executive (general_manager)", "title": "has_executive (general_manager)", "to": "Sara Lesina"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (Managing Director)", "title": "has_executive (Managing Director)", "to": "Peter Shipman"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (executive_affiliation)", "title": "has_executive (executive_affiliation)", "to": "Seeking Alpha"}, {"arrows": "to", "from": "Nvidia", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Jensen Huang"}, {"arrows": "to", "from": "Express Wash Concepts", "label": "has_executive (CEO)\nhas_executive (Founder and CEO)\nhas_executive (founder)", "title": "has_executive (CEO)\nhas_executive (Founder and CEO)\nhas_executive (founder)", "to": "John Roush"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "WonderPort Collectibles"}, {"arrows": "to", "from": "Cape Venison \u0026 Biltong", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Unnamed Founder"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "LABUBU"}, {"arrows": "to", "from": "Insilico Medicine", "label": "has_executive (Head of Insilico Hong Kong)", "title": "has_executive (Head of Insilico Hong Kong)", "to": "Frank Pun"}, {"arrows": "to", "from": "Insilico Medicine", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "SRW Laboratories"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (analyst)\nhas_executive (market_strategist)", "title": "has_executive (analyst)\nhas_executive (market_strategist)", "to": "Jessica Amir"}, {"arrows": "to", "from": "Reserve Bank", "label": "has_executive (deputy governor)", "title": "has_executive (deputy governor)", "to": "Andrew Hauser"}, {"arrows": "to", "from": "BIWIN Storage Technology", "label": "owns (manufacturer)", "title": "owns (manufacturer)", "to": "Acer"}, {"arrows": "to", "from": "BIWIN Storage Technology", "label": "owns (manufacturer)", "title": "owns (manufacturer)", "to": "HP"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (Senior Vice President and President of International Business)", "title": "has_executive (Senior Vice President and President of International Business)", "to": "Wen Deyi"}, {"arrows": "to", "from": "KeyMavens Real Estate Development", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Jason Kiszonak"}, {"arrows": "to", "from": "Engel \u0026 V\u00f6lkers Middle East", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Daniel Hadi"}, {"arrows": "to", "from": "KeyMavens Real Estate Development", "label": "owns (development_project)", "title": "owns (development_project)", "to": "Montage Technology"}, {"arrows": "to", "from": "Engel \u0026 V\u00f6lkers Middle East", "label": "invested_in (sales_partnership)", "title": "invested_in (sales_partnership)", "to": "Montage Technology"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (control)", "title": "owns (control)", "to": "collectible designer toys"}, {"arrows": "to", "from": "Boston Scientific", "label": "invested_in (series D financing)", "title": "invested_in (series D financing)", "to": "4C Medical Technologies"}, {"arrows": "to", "from": "Boston Scientific", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Mike Mahoney"}, {"arrows": "to", "from": "Boston Scientific", "label": "has_executive (CFO)", "title": "has_executive (CFO)", "to": "Daniel Brennan"}, {"arrows": "to", "from": "4C Medical", "label": "has_executive (chairman of the board)", "title": "has_executive (chairman of the board)", "to": "Jeff Chambers"}, {"arrows": "to", "from": "Edwards Lifesciences", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "Innovalve Bio Medical"}, {"arrows": "to", "from": "4C Medical Technologies Inc.", "label": "invested_in (series D financing)", "title": "invested_in (series D financing)", "to": "Boston Scientific Corp."}, {"arrows": "to", "from": "Montage Partners", "label": "owns (sale)", "title": "owns (sale)", "to": "Nucor"}, {"arrows": "to", "from": "Moo Moo Express Car Wash", "label": "has_executive (CEO)\nhas_executive (Founder)", "title": "has_executive (CEO)\nhas_executive (Founder)", "to": "John Roush"}, {"arrows": "to", "from": "Quantum Catalyzer", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Amanda Stein"}, {"arrows": "to", "from": "Quantum Catalyzer", "label": "owns (startup)", "title": "owns (startup)", "to": "EuQlid"}, {"arrows": "to", "from": "Brand Finance", "label": "has_executive (Managing Director)", "title": "has_executive (Managing Director)", "to": "Scott Chen"}, {"arrows": "to", "from": "SK hynix", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "TSMC"}, {"arrows": "to", "from": "Lopez Research", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Maribel Lopez"}, {"arrows": "to", "from": "BMW", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "BMW"}, {"arrows": "to", "from": "Samsung", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Samsung"}, {"arrows": "to", "from": "Good Money Guide", "label": "has_executive (Founder)", "title": "has_executive (Founder)", "to": "Richard"}, {"arrows": "to", "from": "Sirio Pharma", "label": "has_executive (director_of_marketing)", "title": "has_executive (director_of_marketing)", "to": "Evelyn Reinson"}, {"arrows": "to", "from": "Best Formulations", "label": "has_executive (director_of_marketing)", "title": "has_executive (director_of_marketing)", "to": "Evelyn Reinson"}, {"arrows": "to", "from": "ASE Technology Holding Co Ltd", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Dr Tien Wu"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (listed_company)", "title": "owns (listed_company)", "to": "09992"}, {"arrows": "to", "from": "Chinasoft International", "label": "invested_in (financial_support)", "title": "invested_in (financial_support)", "to": "Cambodia"}, {"arrows": "to", "from": "Chinasoft International", "label": "has_executive (President)", "title": "has_executive (President)", "to": "Xi Jinping"}, {"arrows": "to", "from": "Hyperfine, Inc.", "label": "has_executive (employed)", "title": "has_executive (employed)", "to": "Eugene Knopp"}, {"arrows": "to", "from": "Hyperfine, Inc.", "label": "has_executive (employed)", "title": "has_executive (employed)", "to": "Khalid Siddiqui"}, {"arrows": "to", "from": "HoYoverse", "label": "has_executive (producer)", "title": "has_executive (producer)", "to": "Zhenyu Li"}, {"arrows": "to", "from": "Chinasoft International", "label": "invested_in (infrastructure_development)", "title": "invested_in (infrastructure_development)", "to": "stadium in C\u00f4te d\u0027Ivoire"}, {"arrows": "to", "from": "Elon Musk", "label": "has_executive (focus_on)", "title": "has_executive (focus_on)", "to": "U.S.A.I.D."}, {"arrows": "to", "from": "U.S.A.I.D.", "label": "has_executive (relation_to)", "title": "has_executive (relation_to)", "to": "Elon Musk"}, {"arrows": "to", "from": "Wealthsimple", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "margin trading"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (analyst)", "title": "has_executive (analyst)", "to": "Dustin Wei"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (analyst)", "title": "has_executive (analyst)", "to": "Carol Xia"}, {"arrows": "to", "from": "China International Television Corporation", "label": "owns (subsidiary_of)", "title": "owns (subsidiary_of)", "to": "China Media Group"}, {"arrows": "to", "from": "IJ Reportika", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Ian Huang"}, {"arrows": "to", "from": "Futu", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "MooMoo"}, {"arrows": "to", "from": "Intel", "label": "has_executive (former CEO)", "title": "has_executive (former CEO)", "to": "Pat Gelsinger"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (Vice President of Strategy)", "title": "has_executive (Vice President of Strategy)", "to": "Justin Zacks"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Michael Arbus"}, {"arrows": "to", "from": "Silicon Motion Technology", "label": "owns (controller_innovation)", "title": "owns (controller_innovation)", "to": "SM2508"}, {"arrows": "to", "from": "Silicon Motion Technology", "label": "owns (controller_innovation)", "title": "owns (controller_innovation)", "to": "SM2320"}, {"arrows": "to", "from": "ADATA Technology", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "Silicon Motion Technology"}, {"arrows": "to", "from": "BIWIN STORAGE TECHNOLOGY", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "Silicon Motion Technology"}, {"arrows": "to", "from": "Lexar", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "Silicon Motion Technology"}, {"arrows": "to", "from": "Fanxiang", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "Silicon Motion Technology"}, {"arrows": "to", "from": "MooMoo", "label": "owns (project)", "title": "owns (project)", "to": "Elliott Brown"}, {"arrows": "to", "from": "MooMoo", "label": "owns (project)", "title": "owns (project)", "to": "Mitchell Ward"}, {"arrows": "to", "from": "MASE Events", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "Elliott Brown"}, {"arrows": "to", "from": "Hey Juj", "label": "owns (project)", "title": "owns (project)", "to": "Elliott Brown"}, {"arrows": "to", "from": "Hey Zozo\u2019s", "label": "owns (project)", "title": "owns (project)", "to": "Elliott Brown"}, {"arrows": "to", "from": "Sirio Pharma", "label": "owns (acquisition)", "title": "owns (acquisition)", "to": "Best Formulations"}, {"arrows": "to", "from": "Sirio Pharma", "label": "has_executive (general_manager)", "title": "has_executive (general_manager)", "to": "Alex Du"}, {"arrows": "to", "from": "Taiwan Semiconductor Manufacturing Company", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "C.C. Wei"}, {"arrows": "to", "from": "Taiwan Semiconductor Manufacturing Company", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Hyoun Park"}, {"arrows": "to", "from": "Taiwan Semiconductor Manufacturing Company", "label": "has_executive (Co-founder)", "title": "has_executive (Co-founder)", "to": "Neil Shah"}, {"arrows": "to", "from": "Taiwan Semiconductor Manufacturing Company", "label": "has_executive (senior analyst)", "title": "has_executive (senior analyst)", "to": "Shubham Pandey"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Gavin Chia"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (Chief Market Strategist)", "title": "has_executive (Chief Market Strategist)", "to": "Isaac Lim"}, {"arrows": "to", "from": "Pop Mart", "label": "owns (brand)", "title": "owns (brand)", "to": "POPOP"}, {"arrows": "to", "from": "Pop Mart", "label": "has_executive (executive)", "title": "has_executive (executive)", "to": "Chow Sang Sang"}, {"arrows": "to", "from": "Chow Tai Fook", "label": "owns (jewellery_brand)", "title": "owns (jewellery_brand)", "to": "Chow Tai Fook"}, {"arrows": "to", "from": "X", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Elon Musk"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (Head of dealing)", "title": "has_executive (Head of dealing)", "to": "Ken Low"}, {"arrows": "to", "from": "Oriental Kopi Holdings Bhd", "label": "owns (ownership)", "title": "owns (ownership)", "to": "Oriental Kopi"}, {"arrows": "to", "from": "MooMoo", "label": "invested_in (partnership)", "title": "invested_in (partnership)", "to": "TradingView"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (Chief Marketing Officer)\nhas_executive (chief marketing officer)", "title": "has_executive (Chief Marketing Officer)\nhas_executive (chief marketing officer)", "to": "Erika Chiang"}, {"arrows": "to", "from": "TradingView", "label": "has_executive (VP of Growth)\nhas_executive (vice president of international growth)", "title": "has_executive (VP of Growth)\nhas_executive (vice president of international growth)", "to": "Rauan Khassan"}, {"arrows": "to", "from": "Tencent", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Riot Games"}, {"arrows": "to", "from": "Tencent", "label": "owns (minority_stake)", "title": "owns (minority_stake)", "to": "Epic Games"}, {"arrows": "to", "from": "Invesco", "label": "owns (asset_management)", "title": "owns (asset_management)", "to": "Invesco Solutions"}, {"arrows": "to", "from": "CME Group", "label": "has_executive (global_head_of_equity_products)", "title": "has_executive (global_head_of_equity_products)", "to": "Paul Woolman"}, {"arrows": "to", "from": "Invesco", "label": "has_executive (head_of_investments)", "title": "has_executive (head_of_investments)", "to": "Alessio de Longis"}, {"arrows": "to", "from": "T Rowe Price", "label": "has_executive (portfolio_manager)", "title": "has_executive (portfolio_manager)", "to": "Rick de los Reyes"}, {"arrows": "to", "from": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale", "label": "has_executive (head_of_us_equity_strategy)", "title": "has_executive (head_of_us_equity_strategy)", "to": "Manish Kabra"}, {"arrows": "to", "from": "BlackRock Foundation", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Claire Chamberlain"}, {"arrows": "to", "from": "Commonwealth", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Timothy Flacke"}, {"arrows": "to", "from": "Futu Holdings Ltd", "label": "owns (parent_company)", "title": "owns (parent_company)", "to": "MooMoo"}, {"arrows": "to", "from": "MooMoo", "label": "has_executive (executive_link)\nowns (independent_brand_of)", "title": "has_executive (executive_link)\nowns (independent_brand_of)", "to": "FUTU Holdings"}, {"arrows": "to", "from": "Vimian Group AB", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Vimian Group"}, {"arrows": "to", "from": "Zhenyu Technology", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Zhenyu Technology"}, {"arrows": "to", "from": "GXBank", "label": "has_executive (CEO)", "title": "has_executive (CEO)", "to": "Pei-Si Lai"}, {"arrows": "to", "from": "GXBank", "label": "owns (subsidiary)", "title": "owns (subsidiary)", "to": "GXS Bank Pte. Ltd."}, {"arrows": "to", "from": "Seeking Alpha", "label": "has_executive (Head of Marketing)", "title": "has_executive (Head of Marketing)", "to": "DJ Collins"}, {"arrows": "to", "from": "Loong Air", "label": "owns (aircraft)", "title": "owns (aircraft)", "to": "A320-214"}, {"arrows": "to", "from": "MooMoo", "label": "owns (majority_ownership)", "title": "owns (majority_ownership)", "to": "Futu Holdings Limited"}, {"arrows": "to", "from": "Futu Holdings", "label": "has_executive (founder)", "title": "has_executive (founder)", "to": "Ishan Jain"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.9,
+            "gravitationalConstant": -4000,
+            "springConstant": 0.04,
+            "springLength": 120
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+         background: rgba(255, 255, 255, 0.8); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="width: 300px; height: 40px; background: white; border: 1px solid gray; border-radius: 20px; display: flex; align-items: center; padding: 5px;">
+            <div style="width: 30px; height: 30px; background: #2196f3; border-radius: 50%; margin-right: 10px;"></div>
+            <div>Loading...</div>
+        </div>
+    </div>
+
+    <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: white; padding: 10px; border: 1px solid gray;">
+      <input id="searchBox" type="text" placeholder="Search entity..." style="width: 200px;">
+      <button onclick="searchNode()">Search</button>
+      <button onclick="resetGraph()">Reset</button>
+      <br><br>
+      <label for="layerSlider">Filter Layers:</label>
+      <input id="layerSlider" type="range" min="1" max="10" value="1" oninput="updateLayerLabel(this.value)">
+      <span id="layerLabel">1</span>
+      <button onclick="filterLayers()">Apply</button>
+    </div>
+
+    <script>
+    var lastFocusedNode = null;
+    var originalNodes = null;
+    var originalEdges = null;
+
+    function initializeOriginalData() {
+        // Save the original state of nodes and edges
+        if (!originalNodes || !originalEdges) {
+            originalNodes = network.body.data.nodes.get().map(node => ({ ...node })); // Deep copy nodes
+            originalEdges = network.body.data.edges.get().map(edge => ({ ...edge })); // Deep copy edges
+        }
+    }
+
+    function searchNode() {
+        var input = document.getElementById('searchBox').value.trim().toLowerCase();
+        var found = null;
+        var nodes = network.body.data.nodes.get();
+
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].label && nodes[i].label.toLowerCase().includes(input)) {
+                found = nodes[i].id;
+                break;
+            }
+        }
+
+        if (found !== null) {
+            if (lastFocusedNode !== null) {
+                network.body.data.nodes.update({
+                    id: lastFocusedNode,
+                    color: undefined,
+                    size: undefined
+                });
+            }
+
+            network.focus(found, {
+                scale: 1.5,
+                animation: {
+                    duration: 1000,
+                    easingFunction: 'easeInOutQuad'
+                }
+            });
+
+            network.body.data.nodes.update({
+                id: found,
+                color: {
+                    background: 'yellow',
+                    border: 'orange'
+                },
+                size: 40
+            });
+
+            lastFocusedNode = found;
+        } else {
+            alert("Entity not found!");
+        }
+    }
+
+    function resetGraph() {
+        if (originalNodes && originalEdges) {
+            // 显示加载动画
+            var loader = document.getElementById('loadingOverlay');
+            if (loader) loader.style.display = 'flex';
+
+            // 使用 requestAnimationFrame 分步更新节点和边，避免卡顿
+            let nodeIndex = 0;
+            let edgeIndex = 0;
+
+            function updateNodes() {
+                const batchSize = 100; // 每次更新的节点数量
+                const nodesToUpdate = originalNodes.slice(nodeIndex, nodeIndex + batchSize).map(node => ({
+                    ...node,
+                    hidden: false
+                }));
+                network.body.data.nodes.update(nodesToUpdate);
+                nodeIndex += batchSize;
+
+                if (nodeIndex < originalNodes.length) {
+                    requestAnimationFrame(updateNodes);
+                } else {
+                    updateEdges(); // 开始更新边
+                }
+            }
+
+            function updateEdges() {
+                const batchSize = 100; // 每次更新的边数量
+                const edgesToUpdate = originalEdges.slice(edgeIndex, edgeIndex + batchSize).map(edge => ({
+                    ...edge,
+                    hidden: false
+                }));
+                network.body.data.edges.update(edgesToUpdate);
+                edgeIndex += batchSize;
+
+                if (edgeIndex < originalEdges.length) {
+                    requestAnimationFrame(updateEdges);
+                } else {
+                    // 隐藏加载动画
+                    if (loader) loader.style.display = 'none';
+                }
+            }
+
+            updateNodes(); // 开始更新节点
+        } else {
+            alert("Original graph data not found!");
+        }
+    }
+
+    function updateLayerLabel(value) {
+        document.getElementById('layerLabel').innerText = value;
+    }
+
+    function filterLayers() {
+        var layerCount = parseInt(document.getElementById('layerSlider').value);
+        var input = document.getElementById('searchBox').value.trim().toLowerCase();
+        var nodes = network.body.data.nodes.get();
+        var edges = network.body.data.edges.get();
+
+        if (!input) {
+            alert("Please enter a search term first.");
+            return;
+        }
+
+        var foundNode = null;
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].label && nodes[i].label.toLowerCase().includes(input)) {
+                foundNode = nodes[i].id;
+                break;
+            }
+        }
+
+        if (foundNode === null) {
+            alert("Entity not found!");
+            return;
+        }
+
+        var visibleNodes = new Set([foundNode]);
+        var visibleEdges = new Set();
+
+        if (layerCount >= 1) {
+            // First layer: directly connected nodes
+            edges.forEach(function(edge) {
+                if (edge.from === foundNode) {
+                    visibleNodes.add(edge.to);
+                    visibleEdges.add(edge.id);
+                } else if (edge.to === foundNode) {
+                    visibleNodes.add(edge.from);
+                    visibleEdges.add(edge.id);
+                }
+            });
+
+            // If the layer count is greater than 1, expand further
+            for (var layer = 1; layer < layerCount; layer++) {
+                var newNodes = new Set();
+                edges.forEach(function(edge) {
+                    if (visibleNodes.has(edge.from) && !visibleNodes.has(edge.to)) {
+                        visibleNodes.add(edge.to);
+                        visibleEdges.add(edge.id);
+                        newNodes.add(edge.to);
+                    } else if (visibleNodes.has(edge.to) && !visibleNodes.has(edge.from)) {
+                        visibleNodes.add(edge.from);
+                        visibleEdges.add(edge.id);
+                        newNodes.add(edge.from);
+                    }
+                });
+                if (newNodes.size === 0) break; // Stop expanding if no new nodes are found
+            }
+        }
+
+        // Update the graph data
+        network.body.data.nodes.update(nodes.map(function(node) {
+            return {
+                id: node.id,
+                hidden: !visibleNodes.has(node.id)
+            };
+        }));
+
+        network.body.data.edges.update(edges.map(function(edge) {
+            return {
+                id: edge.id,
+                hidden: !visibleEdges.has(edge.id)
+            };
+        }));
+    }
+
+    window.addEventListener("load", function() {
+        initializeOriginalData(); // 初始化时保存原始数据
+    });
+
+    window.addEventListener("message", function(event) {
+        if (event.data && event.data.type === "searchNode") {
+            var query = event.data.query;
+            if (query) {
+                document.getElementById('searchBox').value = query;
+                searchNode();
+            }
+        } else if (event.data && event.data.type === "filterLayers") {
+            var layerCount = event.data.layerCount;
+            if (layerCount) {
+                document.getElementById('layerSlider').value = layerCount;
+                updateLayerLabel(layerCount);
+                filterLayers();
+            }
+        }
+    });
+
+    document.getElementById("searchBox").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            searchNode();
+        }
+    });
+    </script>
+    
+</body>
+</html>
